@@ -18,6 +18,7 @@ from docassemble.webapp.core.models import Uploads, UploadsUserAuth, UploadsRole
 from docassemble.webapp.files import SavedFile, get_ext_and_mimetype
 from flask import session
 from flask_login import current_user
+from docassemble.webapp.db_object import db
 from sqlalchemy import or_, and_
 import docassemble.base.config
 import sys
@@ -274,7 +275,7 @@ def get_info_from_file_number(file_number, privileged=False, filename=None, uids
     if not privileged and upload is not None and upload.private and upload.key not in uids:
         has_access = False
         if current_user and current_user.is_authenticated:
-            if UserDictKeys.query.filter_by(key=upload.key, user_id=current_user.id).first() or UploadsUserAuth.query.filter_by(uploads_indexno=file_number, user_id=current_user.id).first() or db.session.query(UploadsRoleAuth.id).join(UserRoles, and_(UserRoles.user_id == current_user.id, UploadsRoleAuth.role_id == UserRoles.role_id)).first():
+            if UserDictKeys.query.filter_by(key=upload.key, user_id=current_user.id).first() or UploadsUserAuth.query.filter_by(uploads_indexno=file_number, user_id=current_user.id).first() or db.session.query(UploadsRoleAuth.id).join(UserRoles, and_(UserRoles.user_id == current_user.id, UploadsRoleAuth.role_id == UserRoles.role_id)).filter(UploadsRoleAuth.uploads_indexno == file_number).first():
                 has_access = True
         elif session and 'tempuser' in session:
             temp_user_id = int(session['tempuser'])
