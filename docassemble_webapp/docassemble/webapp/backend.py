@@ -39,6 +39,7 @@ import docassemble.webapp.worker
 from docassemble.webapp.mailgun_mail import Mail as MailgunMail
 from docassemble.webapp.sendgrid_mail import Mail as SendgridMail
 from docassemble.webapp.fixpickle import fix_pickle_obj, fix_pickle_dict
+from docassemble.webapp.screenreader import to_text
 import pandas
 import math
 import xml.etree.ElementTree as ET
@@ -210,11 +211,16 @@ else:
     except:
         DEFAULT_TIMEZONE = 'America/New_York'
 
+COOKIELESS_SESSIONS = daconfig.get('cookieless sessions', False)
+
 def url_for(*pargs, **kwargs):
     if 'jsembed' in docassemble.base.functions.this_thread.misc:
         kwargs['_external'] = True
         if pargs[0] == 'index':
             kwargs['js_target'] = docassemble.base.functions.this_thread.misc['jsembed']
+    if pargs[0] == 'index' and COOKIELESS_SESSIONS:
+        pargs = list(pargs)
+        pargs[0] = 'html_index'
     return base_url_for(*pargs, **kwargs)
 
 def sql_get(key, secret=None):
@@ -311,8 +317,10 @@ docassemble.base.functions.update_server(default_language=DEFAULT_LANGUAGE,
                                          server_sql_delete=sql_delete,
                                          server_sql_keys=sql_keys,
                                          alchemy_url=docassemble.webapp.user_database.alchemy_url,
+                                         connect_args=docassemble.webapp.user_database.connect_args,
                                          default_table_class=DEFAULT_TABLE_CLASS,
-                                         default_thead_class=DEFAULT_THEAD_CLASS)
+                                         default_thead_class=DEFAULT_THEAD_CLASS,
+                                         to_text=to_text)
 docassemble.base.functions.set_language(DEFAULT_LANGUAGE, dialect=DEFAULT_DIALECT)
 docassemble.base.functions.set_locale(DEFAULT_LOCALE)
 docassemble.base.functions.update_locale()

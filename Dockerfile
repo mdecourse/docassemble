@@ -45,10 +45,6 @@ bash -c \
 && chmod ogu+r /usr/share/docassemble/config/config.yml.dist \
 && chmod 755 /etc/ssl/docassemble \
 && cd /tmp \
-&& wget https://bootstrap.pypa.io/get-pip.py \
-&& python get-pip.py \
-&& rm -f get-pip.py \
-&& pip install --upgrade virtualenv \
 && echo \"en_US.UTF-8 UTF-8\" >> /etc/locale.gen \
 && locale-gen \
 && update-locale"
@@ -78,6 +74,10 @@ bash -c \
    pycryptodomex==3.9.9 \
    six==1.15.0 \
    setuptools==50.3.2 \
+&& pip3 install --upgrade \
+   certbot==1.12.0 \
+   certbot-nginx==1.12.0 \
+   certbot-apache==1.12.0 \
 && pip3 install --upgrade \
    /tmp/docassemble/docassemble \
    /tmp/docassemble/docassemble_base \

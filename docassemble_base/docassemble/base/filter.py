@@ -1231,7 +1231,9 @@ def sub_term(m):
         return '[[' + m.group(1) + m.group(2) + ']]'
     return '[[' + m.group(1) + ']]'
 
-def markdown_to_html(a, trim=False, pclass=None, status=None, question=None, use_pandoc=False, escape=False, do_terms=True, indent=None, strip_newlines=None, divclass=None, embedder=None, default_image_width=None, external=False):
+def markdown_to_html(a, trim=False, pclass=None, status=None, question=None, use_pandoc=False, escape=False, do_terms=True, indent=None, strip_newlines=None, divclass=None, embedder=None, default_image_width=None, external=False, verbatim=False):
+    if verbatim:
+        return a
     a = str(a)
     if question is None and status is not None:
         question = status.question
@@ -1369,8 +1371,8 @@ def markdown_to_html(a, trim=False, pclass=None, status=None, question=None, use
             result = result.replace('\n', ' ')
         if divclass is not None:
             result = '<div class="' + str(divclass) + '">' + result + '</div>'
-        if indent and not code_match.search(result):
-            return (" " * indent) + re.sub(r'\n', "\n" + (" " * indent), result).rstrip() + "\n"
+        # if indent and not code_match.search(result):
+        #     return (" " * indent) + re.sub(r'\n', "\n" + (" " * indent), result).rstrip() + "\n"
     return(result)
 
 def my_escape(result):
@@ -1385,7 +1387,7 @@ def noquote(string):
     return '"' + string.replace('\n', ' ').replace('"', '&quot;').rstrip() + '"'
 
 def add_terms_mako(termname, terms, status=None, question=None):
-    lower_termname = re.sub(r'\s+', ' ', termname.lower())
+    lower_termname = re.sub(r'\s+', ' ', termname.lower(), re.DOTALL)
     if lower_termname in terms:
         return('<a tabindex="0" class="daterm" data-toggle="popover" data-container="body" data-placement="bottom" data-content=' + noquote(markdown_to_html(terms[lower_termname]['definition'].text(dict()), trim=True, default_image_width='100%', do_terms=False, status=status, question=question)) + '>' + str(termname) + '</a>')
     #logmessage(lower_termname + " is not in terms dictionary\n")
@@ -1396,7 +1398,7 @@ def add_terms(termname, terms, label=None, status=None, question=None):
         label = str(termname)
     else:
         label = re.sub(r'^\|', '', label)
-    lower_termname = re.sub(r'\s+', ' ', termname.lower())
+    lower_termname = re.sub(r'\s+', ' ', termname.lower(), re.DOTALL)
     if lower_termname in terms:
         return('<a tabindex="0" class="daterm" data-toggle="popover" data-container="body" data-placement="bottom" data-content=' + noquote(markdown_to_html(terms[lower_termname]['definition'], trim=True, default_image_width='100%', do_terms=False, status=status, question=question)) + '>' + label + '</a>')
     #logmessage(lower_termname + " is not in terms dictionary\n")

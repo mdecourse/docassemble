@@ -38,7 +38,7 @@ __all__ = ['DAObject', 'DAList', 'DADict', 'DAOrderedDict', 'DASet', 'DAFile', '
 #unique_names = set()
 
 match_inside_and_outside_brackets = re.compile('(.*)\[([^\]]+)\]$')
-is_number = re.compile(r'[0-9]+')
+is_number = re.compile(r'^[0-9]+$')
 
 def noquote(text):
     return re.sub(r'["\']', '', text)
@@ -1539,7 +1539,7 @@ class DAList(DAObject):
                 number = self.target_number
         if minimum is None:
             minimum = self.minimum_number
-        if number is None and minimum is None:
+        if number is None and (minimum is None or minimum == 0):
             if len(self.elements) == 0:
                 if self.there_are_any:
                     minimum = 1
@@ -2330,7 +2330,7 @@ class DADict(DAObject):
                 number = self.target_number
         if minimum is None:
             minimum = self.minimum_number
-        if number is None and minimum is None:
+        if number is None and (minimum is None or minimum == 0):
             if len(self.elements) == 0:
                 if self.there_are_any:
                     minimum = 1
@@ -2986,7 +2986,7 @@ class DASet(DAObject):
                 number = self.target_number
         if minimum is None:
             minimum = self.minimum_number
-        if number is None and minimum is None:
+        if number is None and (minimum is None or minimum == 0):
             if len(self.elements) == 0:
                 if self.there_are_any:
                     minimum = 1
@@ -3520,7 +3520,10 @@ class DAFile(DAObject):
         c.setopt(pycurl.USERAGENT, server.daconfig.get('user agent', 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36'))
         c.setopt(pycurl.COOKIEFILE, cookiefile.name)
         c.perform()
+        status_code = curl.getinfo(pycurl.HTTP_CODE)
         c.close()
+        if status_code >= 400:
+            raise Exception("from_url: Error %s" % (status_code,))
         self.retrieve()
     def is_encrypted(self):
         """Returns True if the file is a PDF file and it is encrypted, otherwise returns False."""

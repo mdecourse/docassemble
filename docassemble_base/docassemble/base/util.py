@@ -12,6 +12,7 @@ from twilio.rest import Client as TwilioRestClient
 import pycountry
 import docassemble.base.ocr
 import pickle
+from itertools import chain
 from docassemble.base.logger import logmessage
 from docassemble.base.error import DAError, DAValidationError, DAIndexError, DAWebError
 from jinja2.runtime import UndefinedError
@@ -300,7 +301,8 @@ __all__ = [
     'store_variables_snapshot',
     'stash_data',
     'retrieve_stashed_data',
-    'update_terms'
+    'update_terms',
+    'chain'
 ]
 
 #knn_machine_learner = DummyObject
@@ -2471,6 +2473,8 @@ def send_email(to=None, sender=None, reply_to=None, cc=None, bcc=None, body=None
             html = body_html
     if body is None and html is None:
         body = ""
+    if html is None:
+        html = '<html><body>' + body + '</body></html>'
     subject = re.sub(r'[\n\r]+', ' ', subject)
     sender_string = email_stringer(sender, first=True, include_name=True)
     reply_to_string = email_stringer(reply_to, first=True, include_name=True)

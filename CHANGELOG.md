@@ -1,5 +1,98 @@
 # Change Log
 
+## [1.2.27] - 2021-02-04
+### Changed
+- Added `variable_name` to items under `attachments` in the JSON
+  representation of a question.
+### Fixed
+- Removed use of `certbot-auto`.
+
+## [1.2.26] - 2021-01-28
+### Fixed
+- Error in Dockerfile.
+
+## [1.2.25] - 2021-01-27
+### Added
+- The `region` parameter under the `google` Configuration directive,
+  for biasing the address autocomplete feature.
+### Fixed
+- Unicode characters in PDF forms were altered if they were not part
+  of `latin1`.
+
+## [1.2.24] - 2021-01-24
+### Not changed
+- The license.  (Just in case you thought the 1/14/2021 @docassemble
+  Twitter thread about the dystopian MIT-SAFE License was real.)
+### Changed
+- The `from_url()` method will now raise an exception if there is an
+  error retrieving the URL.
+- The `avconv` Configuration directive is now called `ffmpeg`.
+- Uploading a video no longer runs a conversion to `.ogg`.
+### Added
+- Option for connecting to a PostgreSQL database using SSL with `db`
+  and other database configurations.  A system update is required to
+  use this feature.
+### Fixed
+- Problem writing error messages to the logs when Mailgun mail sending
+  fails.
+- Error in `pdf_concatenate()` when JavaScript in a PDF is text
+  instead of bytes.
+- Non-graceful failure on Google Drive configuration page when API for
+  obtaining a file listing raises an exception.
+
+## [1.2.23] - 2021-01-07
+### Changed
+- Expanded the information available in the data view of a question.
+- Unicode passed in URL arguments is no longer escaped.
+### Fixed
+- The `next` parameter now contains the session ID upon attempting to
+  access a session in an interview with `require login`.
+- `depends on` and `on change` now can be used with generic object
+  and/or index variables even when the fields being changed do not
+  literally match the variable name specified in `depends on` or `on
+  change`.
+- Problem with `show if` when there are two fields with the same name
+  visible on the screen at the same time.
+
+## [1.2.22] - 2021-01-04
+### Changed
+- Expanded the information available in the data view of a question.
+### Fixed
+- Issue with combobox update triggers.
+- Issue with `DADict` objects in `code` for multiple choice lists.
+
+## [1.2.21] - 2020-12-29
+### Changed
+- The `list collect` feature will now show the `minimum_number` of
+  entries if `minimum_number` is set.
+
+## [1.2.20] - 2020-12-28
+### Fixed
+- Error with `generic object` inheritance.
+
+## [1.2.19] - 2020-12-26
+### Fixed
+- Error in `.object_name()`.
+
+## [1.2.18] - 2020-12-22
+### Fixed
+- Adapted to new version of `pip`.
+
+## [1.2.17] - 2020-12-22
+### Changed
+- Different startup mechanism for `celery`.
+- Removed `--force-reinstall` from `pip` invocation.
+
+## [1.2.16] - 2020-12-15
+### Added
+- The `chain` function from `itertools`.
+### Fixed
+- Forced deletion of `Flask-User`.
+
+## [1.2.15] - 2020-12-14
+### Fixed
+- Pinned dependencies of fork dependencies.
+
 ## [1.2.14] - 2020-12-09
 ### Fixed
 - Problem with the way in which `pip` was invoked, given new version

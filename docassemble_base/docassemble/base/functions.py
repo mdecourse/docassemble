@@ -1391,6 +1391,7 @@ server.absolute_filename = null_func
 server.add_privilege = null_func
 server.add_user_privilege = null_func
 server.alchemy_url = null_func
+server.connect_args = null_func
 server.applock = null_func
 server.bg_action = null_func
 server.button_class_prefix = 'btn-'
@@ -1474,6 +1475,7 @@ server.wait_for_task = null_func
 server.worker_convert = null_func
 server.write_answer_json = null_func
 server.write_record = null_func
+server.to_text = null_func
 
 def write_record(key, data):
     """Stores the data in a SQL database for later retrieval with the

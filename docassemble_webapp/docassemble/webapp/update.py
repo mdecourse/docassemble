@@ -82,7 +82,7 @@ def check_for_updates(doing_startup=False):
     results = dict()
     sys.stderr.write("check_for_updates: 0.5 after " + str(time.time() - start_time) + " seconds\n")
 
-    for package_name in ('psycopg2', 'pdfminer', 'pdfminer3k', 'py-bcrypt', 'pycrypto', 'constraint', 'distutils2', 'azure-storage'):
+    for package_name in ('psycopg2', 'pdfminer', 'pdfminer3k', 'py-bcrypt', 'pycrypto', 'constraint', 'distutils2', 'azure-storage', 'Flask-User'):
         num_deleted = Package.query.filter_by(name=package_name).delete()
         if num_deleted > 0:
             db.session.commit()
@@ -450,13 +450,16 @@ def install_package(package):
     #else:
     #    disable_pip_cache = True
     disable_pip_cache = True
+    if package.type in ('zip', 'git'):
+        returnval, newlog = uninstall_package(package, sleep=False)
+        logfilecontents += newlog
     if package.type == 'zip' and package.upload is not None:
         saved_file = SavedFile(package.upload, extension='zip', fix=True)
         commands = ['pip', 'install']
         if disable_pip_cache:
             commands.append('--no-cache-dir')
-        commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--log-file=' + pip_log.name, '--force-reinstall', '--upgrade', saved_file.path + '.zip'])
-    elif package.type == 'git' and package.giturl is not None:
+        commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--log-file=' + pip_log.name, '--upgrade', saved_file.path + '.zip'])
+    elif package.type == 'git' and package.giturl:
         if package.gitbranch is not None:
             branchpart = '@' + str(package.gitbranch)
         else:
@@ -473,12 +476,12 @@ def install_package(package):
             commands = ['pip', 'install']
             if disable_pip_cache:
                 commands.append('--no-cache-dir')
-            commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--force-reinstall', '--upgrade', '--log-file=' + pip_log.name, gitprefix + str(package.giturl) + gitsuffix + branchpart + '#egg=' + package.name + '&subdirectory=' + str(package.gitsubdir)])
+            commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--upgrade', '--log-file=' + pip_log.name, gitprefix + str(package.giturl) + gitsuffix + branchpart + '#egg=' + package.name + '&subdirectory=' + str(package.gitsubdir)])
         else:
             commands = ['pip', 'install']
             if disable_pip_cache:
                 commands.append('--no-cache-dir')
-            commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--force-reinstall', '--upgrade', '--log-file=' + pip_log.name, gitprefix + str(package.giturl) + gitsuffix + branchpart + '#egg=' + package.name])
+            commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--upgrade', '--log-file=' + pip_log.name, gitprefix + str(package.giturl) + gitsuffix + branchpart + '#egg=' + package.name])
     elif package.type == 'pip':
         if package.limitation is None:
             limit = ""
@@ -487,7 +490,7 @@ def install_package(package):
         commands = ['pip', 'install']
         if disable_pip_cache:
             commands.append('--no-cache-dir')
-        commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--force-reinstall', '--upgrade', '--log-file=' + pip_log.name, package.name + limit])
+        commands.extend(['--quiet', '--prefix=' + PACKAGE_DIRECTORY, '--src=' + temp_dir, '--upgrade', '--log-file=' + pip_log.name, package.name + limit])
     else:
         sys.stderr.write("Wrong package type\n")
         return 1, 'Unable to recognize package type: ' + package.name
@@ -518,7 +521,7 @@ def install_package(package):
     shutil.rmtree(temp_dir)
     return returnval, logfilecontents
 
-def uninstall_package(package):
+def uninstall_package(package, sleep=True):
     sys.stderr.write('uninstall_package: ' + package.name + "\n")
     logfilecontents = ''
     #sys.stderr.write("uninstall_package: uninstalling " + package.name + "\n")
@@ -546,7 +549,8 @@ def uninstall_package(package):
         pass
     sys.stderr.flush()
     sys.stdout.flush()
-    time.sleep(4)
+    if sleep:
+        time.sleep(4)
     sys.stderr.write('uninstall_package: done' + "\n")
     return returnval, logfilecontents
 
